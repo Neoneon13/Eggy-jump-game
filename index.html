@@ -9,11 +9,13 @@ body{
 font-family:Arial;
 text-align:center;
 background:linear-gradient(#87CEEB,#ffffff);
+overflow-x:hidden;
 }
 
 #egg{
 font-size:90px;
 transition:transform 0.2s;
+position:relative;
 }
 
 .jump{
@@ -29,6 +31,22 @@ cursor:pointer;
 
 .panel{
 margin:15px;
+}
+
+.floating{
+position:absolute;
+font-weight:bold;
+animation:floatUp 1s forwards;
+}
+
+@keyframes floatUp{
+0%{opacity:1; transform:translateY(0);}
+100%{opacity:0; transform:translateY(-50px);}
+}
+
+textarea{
+width:300px;
+height:60px;
 }
 
 </style>
@@ -77,17 +95,36 @@ Buy Auto Jumper
 Cost: <span id="autoCost">500</span>
 </button>
 
+<p>Auto Jumpers: <span id="autoCount">0</span></p>
+
 </div>
 
 <div class="panel">
 
-<h3>Auto Jumpers: <span id="autoCount">0</span></h3>
+<h2>🏆 Achievements</h2>
+
+<ul id="achievements"></ul>
+
+</div>
+
+<div class="panel">
+
+<h2>💾 Save System</h2>
+
+<button onclick="save()">Save</button>
+<button onclick="exportSave()">Export</button>
+<button onclick="importSave()">Import</button>
+
+<br><br>
+
+<textarea id="saveData"></textarea>
 
 </div>
 
 <script>
 
 let points = 0
+let totalJumps = 0
 
 let trampolineLevel = 1
 let eggLevel = 0
@@ -97,6 +134,12 @@ let eggCost = 50
 
 let autoJumpers = 0
 let autoCost = 500
+
+let achievements = {
+firstJump:false,
+hundredPoints:false,
+thousandPoints:false
+}
 
 function pointsPerJump(){
 return trampolineLevel + eggLevel
@@ -113,11 +156,16 @@ document.getElementById("eggCost").innerText = eggCost
 document.getElementById("autoCost").innerText = autoCost
 document.getElementById("autoCount").innerText = autoJumpers
 
+updateAchievements()
+
 }
 
 function jump(){
 
-points += pointsPerJump()
+let gain = pointsPerJump()
+
+points += gain
+totalJumps++
 
 let egg = document.getElementById("egg")
 
@@ -127,7 +175,27 @@ setTimeout(()=>{
 egg.classList.remove("jump")
 },200)
 
+showFloating(gain)
+
 update()
+
+}
+
+function showFloating(amount){
+
+let float = document.createElement("div")
+
+float.innerText = "+" + amount
+float.className = "floating"
+
+float.style.left = (window.innerWidth/2 + Math.random()*40-20)+"px"
+float.style.top = "200px"
+
+document.body.appendChild(float)
+
+setTimeout(()=>{
+float.remove()
+},1000)
 
 }
 
@@ -138,7 +206,7 @@ if(points >= trampolineCost){
 points -= trampolineCost
 trampolineLevel++
 
-trampolineCost = Math.floor(trampolineCost * 2)
+trampolineCost = Math.floor(trampolineCost*2)
 
 update()
 
@@ -153,7 +221,7 @@ if(points >= eggCost){
 points -= eggCost
 eggLevel++
 
-eggCost = Math.floor(eggCost * 2)
+eggCost = Math.floor(eggCost*2)
 
 update()
 
@@ -168,7 +236,7 @@ if(points >= autoCost){
 points -= autoCost
 autoJumpers++
 
-autoCost = Math.floor(autoCost * 2)
+autoCost = Math.floor(autoCost*2)
 
 update()
 
@@ -184,35 +252,83 @@ update()
 
 },1000)
 
+function updateAchievements(){
+
+let list = document.getElementById("achievements")
+
+list.innerHTML=""
+
+if(totalJumps>=1) achievements.firstJump=true
+if(points>=100) achievements.hundredPoints=true
+if(points>=1000) achievements.thousandPoints=true
+
+if(achievements.firstJump){
+list.innerHTML += "<li>First Jump</li>"
+}
+
+if(achievements.hundredPoints){
+list.innerHTML += "<li>100 Points</li>"
+}
+
+if(achievements.thousandPoints){
+list.innerHTML += "<li>1000 Points</li>"
+}
+
+}
+
 function save(){
 
-localStorage.setItem("eggyJumpSave", JSON.stringify({
+localStorage.setItem("eggyJumpSave",JSON.stringify({
 points,
+totalJumps,
 trampolineLevel,
 eggLevel,
 trampolineCost,
 eggCost,
 autoJumpers,
-autoCost
+autoCost,
+achievements
 }))
 
 }
 
 function load(){
 
-let saveData = JSON.parse(localStorage.getItem("eggyJumpSave"))
+let data = JSON.parse(localStorage.getItem("eggyJumpSave"))
 
-if(saveData){
+if(data){
 
-points = saveData.points
-trampolineLevel = saveData.trampolineLevel
-eggLevel = saveData.eggLevel
-trampolineCost = saveData.trampolineCost
-eggCost = saveData.eggCost
-autoJumpers = saveData.autoJumpers
-autoCost = saveData.autoCost
+points=data.points
+totalJumps=data.totalJumps
+trampolineLevel=data.trampolineLevel
+eggLevel=data.eggLevel
+trampolineCost=data.trampolineCost
+eggCost=data.eggCost
+autoJumpers=data.autoJumpers
+autoCost=data.autoCost
+achievements=data.achievements
 
 }
+
+}
+
+function exportSave(){
+
+save()
+
+document.getElementById("saveData").value =
+localStorage.getItem("eggyJumpSave")
+
+}
+
+function importSave(){
+
+let data = document.getElementById("saveData").value
+
+localStorage.setItem("eggyJumpSave",data)
+
+load()
+update()
 
 }
 
