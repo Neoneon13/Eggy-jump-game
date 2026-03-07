@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Eggy Jump</title>
+<style>
+body{
+font-family: Arial;
+text-align:center;
+background:#87CEEB;
+}
+
+button{
+padding:10px 20px;
+font-size:16px;
+margin:5px;
+cursor:pointer;
+}
+
+#egg{
+font-size:80px;
+margin:20px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🥚 Eggy Jump</h1>
+
+<div id="egg">🥚</div>
+
+<h2>Points: <span id="points">0</span></h2>
+<h3>Points Per Jump: <span id="ppj">1</span></h3>
+
+<button onclick="jump()">JUMP</button>
+
+<h2>🪂 Trampolines</h2>
+
+<button onclick="buyTrampoline()">
+Upgrade Trampoline (Cost: <span id="trampolineCost">25</span>)
+</button>
+
+<h2>🥚 Eggs</h2>
+
+<button onclick="buyEgg()">
+Upgrade Egg (Cost: <span id="eggCost">50</span>)
+</button>
+
+<script>
+
+let points = 0
+
+let trampolineLevel = 1
+let eggLevel = 0
+
+let trampolineCost = 25
+let eggCost = 50
+
+function pointsPerJump(){
+return trampolineLevel + eggLevel
+}
+
+function update(){
+document.getElementById("points").innerText = points
+document.getElementById("ppj").innerText = pointsPerJump()
+document.getElementById("trampolineCost").innerText = trampolineCost
+document.getElementById("eggCost").innerText = eggCost
+}
+
+function jump(){
+points += pointsPerJump()
+update()
+}
+
+function buyTrampoline(){
+if(points >= trampolineCost){
+
+points -= trampolineCost
+trampolineLevel++
+
+trampolineCost = Math.floor(trampolineCost * 2)
+
+update()
+}
+}
+
+function buyEgg(){
+if(points >= eggCost){
+
+points -= eggCost
+eggLevel++
+
+eggCost = Math.floor(eggCost * 2)
+
+update()
+}
+}
+
+update()
+
+</script>
+
+</body>
+</html>
