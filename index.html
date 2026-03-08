@@ -1,7 +1,8 @@
+"}
 <!DOCTYPE html>
 <html>
 <head>
-<title>Eggy Jump</title>
+<title>Eggy Jump - Ultra Edition</title>
 
 <style>
 
@@ -14,7 +15,7 @@ overflow-x:hidden;
 
 #gameArea{
 position:relative;
-height:170px;
+height:180px;
 margin-bottom:10px;
 }
 
@@ -26,7 +27,7 @@ z-index:2;
 }
 
 .jump{
-transform:translateY(-40px);
+transform:translateY(-45px);
 }
 
 #trampoline{
@@ -35,6 +36,11 @@ position:absolute;
 bottom:0;
 left:50%;
 transform:translateX(-50%);
+transition:transform 0.15s;
+}
+
+.bounce{
+transform:translateX(-50%) scaleY(0.75);
 }
 
 button{
@@ -56,7 +62,7 @@ animation:floatUp 1s forwards;
 
 @keyframes floatUp{
 0%{opacity:1; transform:translateY(0);}
-100%{opacity:0; transform:translateY(-50px);}
+100%{opacity:0; transform:translateY(-60px);}
 }
 
 </style>
@@ -69,7 +75,7 @@ animation:floatUp 1s forwards;
 
 <div id="gameArea">
 <div id="egg">🥚</div>
-<div id="trampoline">🪂</div>
+<div id="trampoline">🛏️</div>
 </div>
 
 <h2>Points: <span id="points">0</span></h2>
@@ -80,21 +86,15 @@ animation:floatUp 1s forwards;
 
 <div class="panel">
 
-<h2>🪂 Trampolines</h2>
+<h2>🪂 Upgrades</h2>
 
 <button onclick="buyTrampoline()">
-Upgrade Trampoline  
+Upgrade Jump Power  
 Cost: <span id="trampolineCost">25</span>
 </button>
 
-</div>
-
-<div class="panel">
-
-<h2>🥚 Eggs</h2>
-
 <button onclick="buyEgg()">
-Upgrade Egg  
+Upgrade Egg Strength  
 Cost: <span id="eggCost">50</span>
 </button>
 
@@ -109,10 +109,8 @@ Buy Auto Jumper
 Cost: <span id="autoCost">500</span>
 </button>
 
-</div>
+<p>Auto Jumpers: <span id="autoCount">0</span></p>
 
-<div class="panel">
-<h3>Auto Jumpers: <span id="autoCount">0</span></h3>
 </div>
 
 <div class="panel">
@@ -134,12 +132,11 @@ let eggCost = 50
 let autoJumpers = 0
 let autoCost = 500
 
-let trampolines = ["🛏️""🛌"]
-
 let achievements = {
 firstJump:false,
 hundredPoints:false,
-thousandPoints:false
+thousandPoints:false,
+hundredJumps:false
 }
 
 function pointsPerJump(){
@@ -158,9 +155,6 @@ document.getElementById("eggCost").innerText = eggCost
 document.getElementById("autoCost").innerText = autoCost
 document.getElementById("autoCount").innerText = autoJumpers
 
-let index = Math.min(trampolineLevel-1, trampolines.length-1)
-document.getElementById("trampoline").innerText = trampolines[index]
-
 updateAchievements()
 
 }
@@ -169,15 +163,27 @@ function jump(){
 
 let gain = pointsPerJump()
 
+if(Math.random() < 0.1){
+gain *= 5
+}
+
 points += gain
 totalJumps++
 
 let egg = document.getElementById("egg")
+let bed = document.getElementById("trampoline")
 
 egg.classList.add("jump")
 
 setTimeout(()=>{
 egg.classList.remove("jump")
+
+bed.classList.add("bounce")
+
+setTimeout(()=>{
+bed.classList.remove("bounce")
+},150)
+
 },200)
 
 showFloating(gain)
@@ -193,7 +199,7 @@ let float = document.createElement("div")
 float.innerText = "+" + amount
 float.className = "floating"
 
-float.style.left = (window.innerWidth/2 + Math.random()*40-20)+"px"
+float.style.left = (window.innerWidth/2 + Math.random()*60-30)+"px"
 float.style.top = "200px"
 
 document.body.appendChild(float)
@@ -266,18 +272,12 @@ list.innerHTML=""
 if(totalJumps>=1) achievements.firstJump=true
 if(points>=100) achievements.hundredPoints=true
 if(points>=1000) achievements.thousandPoints=true
+if(totalJumps>=100) achievements.hundredJumps=true
 
-if(achievements.firstJump){
-list.innerHTML += "<li>First Jump</li>"
-}
-
-if(achievements.hundredPoints){
-list.innerHTML += "<li>100 Points</li>"
-}
-
-if(achievements.thousandPoints){
-list.innerHTML += "<li>1000 Points</li>"
-}
+if(achievements.firstJump) list.innerHTML+="<li>First Jump</li>"
+if(achievements.hundredPoints) list.innerHTML+="<li>100 Points</li>"
+if(achievements.thousandPoints) list.innerHTML+="<li>1000 Points</li>"
+if(achievements.hundredJumps) list.innerHTML+="<li>100 Jumps</li>"
 
 }
 
@@ -325,4 +325,4 @@ update()
 </script>
 
 </body>
-</html
+</ht
