@@ -1,3 +1,4 @@
+id="39164"}
 <!DOCTYPE html>
 <html>
 <head>
@@ -114,6 +115,8 @@ let eggCost = 50
 let autoJumpers = 0
 let autoCost = 500
 
+let trampolines = ["🪂","🛏️","🎈","🚀","☁️"]
+
 function pointsPerJump(){
 return trampolineLevel + eggLevel
 }
@@ -128,6 +131,9 @@ document.getElementById("eggCost").innerText = eggCost
 
 document.getElementById("autoCost").innerText = autoCost
 document.getElementById("autoCount").innerText = autoJumpers
+
+let index = Math.min(trampolineLevel-1, trampolines.length-1)
+document.getElementById("trampoline").innerText = trampolines[index]
 
 }
 
@@ -239,5 +245,4 @@ update()
 
 </script>
 
-</body>
-</html>
+</
