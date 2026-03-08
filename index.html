@@ -1,4 +1,3 @@
-id="39164"}
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,6 +9,7 @@ body{
 font-family:Arial;
 text-align:center;
 background:linear-gradient(#87CEEB,#ffffff);
+overflow-x:hidden;
 }
 
 #gameArea{
@@ -48,6 +48,17 @@ cursor:pointer;
 margin:15px;
 }
 
+.floating{
+position:absolute;
+font-weight:bold;
+animation:floatUp 1s forwards;
+}
+
+@keyframes floatUp{
+0%{opacity:1; transform:translateY(0);}
+100%{opacity:0; transform:translateY(-50px);}
+}
+
 </style>
 
 </head>
@@ -63,6 +74,7 @@ margin:15px;
 
 <h2>Points: <span id="points">0</span></h2>
 <h3>Points Per Jump: <span id="ppj">1</span></h3>
+<h3>Total Jumps: <span id="jumps">0</span></h3>
 
 <button onclick="jump()">JUMP</button>
 
@@ -103,9 +115,16 @@ Cost: <span id="autoCost">500</span>
 <h3>Auto Jumpers: <span id="autoCount">0</span></h3>
 </div>
 
+<div class="panel">
+<h2>🏆 Achievements</h2>
+<ul id="achievements"></ul>
+</div>
+
 <script>
 
 let points = 0
+let totalJumps = 0
+
 let trampolineLevel = 1
 let eggLevel = 0
 
@@ -115,7 +134,13 @@ let eggCost = 50
 let autoJumpers = 0
 let autoCost = 500
 
-let trampolines = ["🪂","🛏️","🎈","🚀","☁️"]
+let trampolines = ["🛏️""🛌"]
+
+let achievements = {
+firstJump:false,
+hundredPoints:false,
+thousandPoints:false
+}
 
 function pointsPerJump(){
 return trampolineLevel + eggLevel
@@ -125,6 +150,7 @@ function update(){
 
 document.getElementById("points").innerText = Math.floor(points)
 document.getElementById("ppj").innerText = pointsPerJump()
+document.getElementById("jumps").innerText = totalJumps
 
 document.getElementById("trampolineCost").innerText = trampolineCost
 document.getElementById("eggCost").innerText = eggCost
@@ -135,11 +161,16 @@ document.getElementById("autoCount").innerText = autoJumpers
 let index = Math.min(trampolineLevel-1, trampolines.length-1)
 document.getElementById("trampoline").innerText = trampolines[index]
 
+updateAchievements()
+
 }
 
 function jump(){
 
-points += pointsPerJump()
+let gain = pointsPerJump()
+
+points += gain
+totalJumps++
 
 let egg = document.getElementById("egg")
 
@@ -149,7 +180,27 @@ setTimeout(()=>{
 egg.classList.remove("jump")
 },200)
 
+showFloating(gain)
+
 update()
+
+}
+
+function showFloating(amount){
+
+let float = document.createElement("div")
+
+float.innerText = "+" + amount
+float.className = "floating"
+
+float.style.left = (window.innerWidth/2 + Math.random()*40-20)+"px"
+float.style.top = "200px"
+
+document.body.appendChild(float)
+
+setTimeout(()=>{
+float.remove()
+},1000)
 
 }
 
@@ -206,33 +257,61 @@ update()
 
 },1000)
 
+function updateAchievements(){
+
+let list = document.getElementById("achievements")
+
+list.innerHTML=""
+
+if(totalJumps>=1) achievements.firstJump=true
+if(points>=100) achievements.hundredPoints=true
+if(points>=1000) achievements.thousandPoints=true
+
+if(achievements.firstJump){
+list.innerHTML += "<li>First Jump</li>"
+}
+
+if(achievements.hundredPoints){
+list.innerHTML += "<li>100 Points</li>"
+}
+
+if(achievements.thousandPoints){
+list.innerHTML += "<li>1000 Points</li>"
+}
+
+}
+
 function save(){
 
 localStorage.setItem("eggyJumpSave", JSON.stringify({
 points,
+totalJumps,
 trampolineLevel,
 eggLevel,
 trampolineCost,
 eggCost,
 autoJumpers,
-autoCost
+autoCost,
+achievements
 }))
 
 }
 
 function load(){
 
-let saveData = JSON.parse(localStorage.getItem("eggyJumpSave"))
+let data = JSON.parse(localStorage.getItem("eggyJumpSave"))
 
-if(saveData){
+if(data){
 
-points = saveData.points
-trampolineLevel = saveData.trampolineLevel
-eggLevel = saveData.eggLevel
-trampolineCost = saveData.trampolineCost
-eggCost = saveData.eggCost
-autoJumpers = saveData.autoJumpers
-autoCost = saveData.autoCost
+points=data.points
+totalJumps=data.totalJumps
+trampolineLevel=data.trampolineLevel
+eggLevel=data.eggLevel
+trampolineCost=data.trampolineCost
+eggCost=data.eggCost
+autoJumpers=data.autoJumpers
+autoCost=data.autoCost
+achievements=data.achievements
 
 }
 
@@ -245,4 +324,5 @@ update()
 
 </script>
 
-</
+</body>
+</html
