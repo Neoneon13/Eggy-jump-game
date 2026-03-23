@@ -1,8 +1,8 @@
-"}
+}
 <!DOCTYPE html>
 <html>
 <head>
-<title>Eggy Jump - Ultra Edition</title>
+<title>Eggy Jump - Pet Edition</title>
 
 <style>
 
@@ -114,6 +114,26 @@ Cost: <span id="autoCost">500</span>
 </div>
 
 <div class="panel">
+
+<h2>🐾 Pets</h2>
+
+<button onclick="buyPet('fire')">
+🔥 Fire Dog (+2) Cost: <span id="fireCost">200</span>
+</button>
+
+<button onclick="buyPet('grass')">
+🌿 Grass Monkey (+3) Cost: <span id="grassCost">500</span>
+</button>
+
+<button onclick="buyPet('ice')">
+❄️ Ice Penguin (+5) Cost: <span id="iceCost">1500</span>
+</button>
+
+<p>Active Pet: <span id="activePet">None</span></p>
+
+</div>
+
+<div class="panel">
 <h2>🏆 Achievements</h2>
 <ul id="achievements"></ul>
 </div>
@@ -132,6 +152,12 @@ let eggCost = 50
 let autoJumpers = 0
 let autoCost = 500
 
+let pet = null
+
+let fireCost = 200
+let grassCost = 500
+let iceCost = 1500
+
 let achievements = {
 firstJump:false,
 hundredPoints:false,
@@ -140,7 +166,14 @@ hundredJumps:false
 }
 
 function pointsPerJump(){
-return trampolineLevel + eggLevel
+
+let petBonus = 0
+
+if(pet === "fire") petBonus = 2
+if(pet === "grass") petBonus = 3
+if(pet === "ice") petBonus = 5
+
+return trampolineLevel + eggLevel + petBonus
 }
 
 function update(){
@@ -154,6 +187,17 @@ document.getElementById("eggCost").innerText = eggCost
 
 document.getElementById("autoCost").innerText = autoCost
 document.getElementById("autoCount").innerText = autoJumpers
+
+document.getElementById("fireCost").innerText = fireCost
+document.getElementById("grassCost").innerText = grassCost
+document.getElementById("iceCost").innerText = iceCost
+
+let petName = "None"
+if(pet === "fire") petName = "🔥 Fire Dog"
+if(pet === "grass") petName = "🌿 Grass Monkey"
+if(pet === "ice") petName = "❄️ Ice Penguin"
+
+document.getElementById("activePet").innerText = petName
 
 updateAchievements()
 
@@ -255,18 +299,35 @@ update()
 
 }
 
-setInterval(()=>{
+function buyPet(type){
 
-points += autoJumpers * pointsPerJump()
+if(type === "fire" && points >= fireCost){
+points -= fireCost
+pet = "fire"
+}
+
+if(type === "grass" && points >= grassCost){
+points -= grassCost
+pet = "grass"
+}
+
+if(type === "ice" && points >= iceCost){
+points -= iceCost
+pet = "ice"
+}
 
 update()
 
+}
+
+setInterval(()=>{
+points += autoJumpers * pointsPerJump()
+update()
 },1000)
 
 function updateAchievements(){
 
 let list = document.getElementById("achievements")
-
 list.innerHTML=""
 
 if(totalJumps>=1) achievements.firstJump=true
@@ -292,6 +353,7 @@ trampolineCost,
 eggCost,
 autoJumpers,
 autoCost,
+pet,
 achievements
 }))
 
@@ -302,7 +364,6 @@ function load(){
 let data = JSON.parse(localStorage.getItem("eggyJumpSave"))
 
 if(data){
-
 points=data.points
 totalJumps=data.totalJumps
 trampolineLevel=data.trampolineLevel
@@ -311,8 +372,8 @@ trampolineCost=data.trampolineCost
 eggCost=data.eggCost
 autoJumpers=data.autoJumpers
 autoCost=data.autoCost
+pet=data.pet
 achievements=data.achievements
-
 }
 
 }
@@ -325,4 +386,4 @@ update()
 </script>
 
 </body>
-</ht
+</h
